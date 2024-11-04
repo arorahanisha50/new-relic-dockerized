@@ -1,0 +1,35 @@
+version: '3'
+# define all services
+services:
+  newrelic-infraagent:
+    container_name: newrelic-infraagent
+    image: newrelic/infrastructure-bundle:3.2.53
+    environment:
+      - NRIA_LICENSE_KEY=${NRIA_LICENSE_KEY}
+      - NRIA_LOGLEVEL=debug
+      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./postgres-config.yml:/etc/newrelic-infra/integrations.d/postgres-config.yml
+    restart: unless-stopped
+  newrelic-fluentd:
+      container_name: newrelic-fluentd
+      image: newrelic/newrelic-fluentd-docker:latest
+      environment:
+        - API_KEY=${NRIA_LICENSE_KEY}
+        - LOG_LEVEL=info
+      user: "root"
+      volumes:
+        - ./fluent.conf:/fluentd/etc/fluent.conf
+        - ./fluentd-pos:/var/log/fluentd-pos
+        - ./logs:/var/log/containers:ro
+      restart: unless-stopped

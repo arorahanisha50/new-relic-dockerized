@@ -1,0 +1,17 @@
+integrations:
+  - name: nri-postgresql
+    env:
+      USERNAME: {{POSTGRES_USERNAME}}
+      PASSWORD: {{POSTGRES_PASSWORD}}
+      HOSTNAME: localhost
+      PORT: {{POSTGRES_PORT}}
+      DATABASE: {{POSTGRES_DB_NAME}}
+      COLLECT_DB_LOCK_METRICS: false
+      COLLECTION_LIST: ALL
+      TIMEOUT:  10
+      PGBOUNCER: true
+    interval: 15s
+    labels:
+      env: production
+      role: postgresql
+    inventory_source: config/postgresql
